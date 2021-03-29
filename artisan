@@ -1,0 +1,36 @@
+#! /usr/pin/env php
+
+<?php
+
+require 'vendor/autoload.php';
+
+use Dotenv\Dotenv;
+use Commands\ServerMonitor;
+use Symfony\Component\Console\Application;
+
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();
+
+if (! function_exists('env')) {
+    /**
+     * Gets the value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    function env($key, $default = null)
+    {
+        if(key_exists($key, $_ENV)){
+            return $_ENV[$key];
+        }else{
+            return $default;
+        }
+    }
+}
+
+$app = new Application();
+
+$app->add(new ServerMonitor());
+
+$app->run();

@@ -15,7 +15,8 @@
         "phpunit/phpunit": "^9.3",
         "illuminate/collections": "^8.34",
         "vlucas/phpdotenv": "^5.3",
-        "guzzlehttp/guzzle": "^7.3"
+        "guzzlehttp/guzzle": "^7.3",
+        "nesbot/carbon": "^3.8"
     },
     "autoload": {
         "psr-4": {

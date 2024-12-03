@@ -29,9 +29,13 @@ trait SendDataTrait {
                 throw new \Exception("There must be an endpoint and api key set");
             }
             try{
-                $collection->prepend($api_key, "api_key");
-                $client = new Guzzle();
-                $response = $client->request('POST', $endpoint, ['json'=>$collection->toJson()]);
+                $client = new Guzzle([
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $api_key,
+                    ]
+                ]);
+                $response = $client->request('PUT', $endpoint, ['json' => $collection->toArray()]);
+
                 if($response->getStatusCode() != 200){
                     throw new \Exception("Request not accepted");
                 }

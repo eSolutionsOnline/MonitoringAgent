@@ -25,7 +25,7 @@ class ServerInfo extends Statistics
             if (env('FAKE_DATA', 'false') == 'true') {
                 $json = $this->fake();
             } else {
-                exec('mpstat -o JSON', $output);
+                exec('mpstat 1 5 -o JSON', $output);
                 foreach ($output as $item) {
                     $json .= $item;
                 }
@@ -37,8 +37,15 @@ class ServerInfo extends Statistics
             $collection->put('server_type', (string)str_replace('_', '-', "{$stat->sysstat->hosts[0]->sysname} {$stat->sysstat->hosts[0]->release} {$stat->sysstat->hosts[0]->machine}"));
             $collection->put("cpus", (int) $stat->sysstat->hosts[0]->number_of_cpus);
 
-            $idle = number_format($stat->sysstat->hosts[0]->statistics[0]->cpu_load[0]->idle, 2);
-            $load = number_format(100 - number_format($stat->sysstat->hosts[0]->statistics[0]->cpu_load[0]->idle, 2), 2);
+
+            $usage = [];
+            foreach ($stat->sysstat->hosts[0]->statistics as $statistic) {
+                $usage[] = ['idle'=>$statistic->cpu_load[0]->idle];
+            }
+
+            $total_usage = collect($usage);
+            $idle = number_format($total_usage->median('idle'));
+            $load = number_format(100 - $idle);
 
             $collection->put('cpu_load_percent', (float) $load);
             $collection->put('cpu_idle_percent', (float) $idle);
@@ -61,17 +68,21 @@ class ServerInfo extends Statistics
         $date = Carbon::now()->format('d/m/Y');
         $time = Carbon::now()->format('H:i:s');
 
-        $cpu_usr_percent = 1.00;
-        $cpu_nice_percent = 1.00;
-        $cpu_sys_percent = 1.00;
-        $cpu_iowait_percent = 1.00;
-        $cpu_irq_percent = 1.00;
-        $cpu_soft_percent = 1.00;
-        $cpu_steal_percent = 1.00;
-        $cpu_guest_percent = 1.00;
-        $cpu_gnice_percent = 1.00;
-        $cpu_idle_percent = 91.00;
+        $cpu_idle_percent_0 = 91.00;
+        $cpu_other_percent_0 = 9.00;
 
-        return '{"sysstat": {"hosts": [{"nodename": "' . $node_name . '","sysname": "' . $sys_name . '","release": "5.4.0-200-generic","machine": "x86_64","number-of-cpus": ' . $cpus . ',"date": "' . $date . '","statistics": [{"timestamp": "' . $time . '","cpu-load": [{"cpu": "all", "usr": ' . $cpu_usr_percent . ', "nice": ' . $cpu_nice_percent . ', "sys": ' . $cpu_sys_percent . ', "iowait": ' . $cpu_iowait_percent . ', "irq": ' . $cpu_irq_percent . ', "soft": ' . $cpu_soft_percent . ', "steal": ' . $cpu_steal_percent . ', "guest": ' . $cpu_guest_percent . ', "gnice": ' . $cpu_gnice_percent . ', "idle": ' . $cpu_idle_percent . '}]}]}]}}';
+        $cpu_idle_percent_1 = 88.00;
+        $cpu_other_percent_1 = 12.00;
+
+        $cpu_idle_percent_2 = 67.00;
+        $cpu_other_percent_2 = 33.00;
+
+        $cpu_idle_percent_3 = 78.00;
+        $cpu_other_percent_3 = 22.00;
+
+        $cpu_idle_percent_4 = 97.00;
+        $cpu_other_percent_4 = 3.00;
+
+        return '{"sysstat": {"hosts": [{"nodename": "' . $node_name . '","sysname": "' . $sys_name . '","release": "5.4.0-200-generic","machine": "x86_64","number-of-cpus": ' . $cpus . ',"date": "' . $date . '","statistics": [{"timestamp": "' . $time . '","cpu-load": [{"cpu": "all", "usr": '.$cpu_other_percent_0.', "nice": 0.00, "sys": 0.00, "iowait": 0.00, "irq": 0.00, "soft": 0.00, "steal": 0.00, "guest": 0.00, "gnice": 0.00, "idle": '.$cpu_idle_percent_0.'}]},{"timestamp": "' . $time . '","cpu-load": [{"cpu": "all", "usr": '.$cpu_other_percent_1.', "nice": 0.00, "sys": 0.00, "iowait": 0.00, "irq": 0.00, "soft": 0.00, "steal": 0.00, "guest": 0.00, "gnice": 0.00, "idle": '.$cpu_idle_percent_1.'}]},{"timestamp": "' . $time . '","cpu-load": [{"cpu": "all", "usr": '.$cpu_other_percent_2.', "nice": 0.00, "sys": 0.00, "iowait": 0.00, "irq": 0.00, "soft": 0.00, "steal": 0.00, "guest": 0.00, "gnice": 0.00, "idle": '.$cpu_idle_percent_2.'}]},{"timestamp": "' . $time . '","cpu-load": [{"cpu": "all", "usr": '.$cpu_other_percent_3.', "nice": 0.00, "sys": 0.00, "iowait": 0.00, "irq": 0.00, "soft": 0.00, "steal": 0.00, "guest": 0.00, "gnice": 0.00, "idle": '.$cpu_idle_percent_3.'}]},{"timestamp": "' . $time . '","cpu-load": [{"cpu": "all", "usr": '.$cpu_other_percent_4.', "nice": 0.00, "sys": 0.00, "iowait": 0.00, "irq": 0.00, "soft": 0.00, "steal": 0.00, "guest": 0.00, "gnice": 0.00, "idle": '.$cpu_idle_percent_4.'}]}]}]}}';
     }
 }

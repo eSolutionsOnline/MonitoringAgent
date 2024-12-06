@@ -44,8 +44,8 @@ class Memory extends Statistics
                     $collection->put("used_memory_mb", (int) $used);
                     $collection->put("free_memory_mb", (int) $free);
 
-                    $used_memory_percent = number_format(($used / $total) * 100, 2);
-                    $free_memory_percent = number_format(($free / $total) * 100, 2);
+                    $used_memory_percent = number_format(($used / $total) * 100);
+                    $free_memory_percent = number_format(($free / $total) * 100);
 
                     $collection->put("used_memory_percent", (float) $used_memory_percent);
                     $collection->put("free_memory_percent", (float) $free_memory_percent);
